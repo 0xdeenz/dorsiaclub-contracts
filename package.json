@@ -38,7 +38,7 @@
             "contracts": "./contracts",
             "tests": "./test",
             "cache": "./cache",
-            "sources": "./",
+            "sources": "./contracts",
             "build": {
                 "contracts": "./build/contracts",
                 "typechain": "./build/typechain"
