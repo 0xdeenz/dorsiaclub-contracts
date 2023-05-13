@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
 import { Card, CardProperties } from "../libs/Structs.sol";
-import { MAX_SUPPLY, MINT_PRICE, UPDATE_PRICE, ORACLE_FEE } from "../libs/Constants.sol";
+import { MAX_SUPPLY, MINT_PRICE, UPDATE_PRICE, ORACLE_FEE, DCT_AIRDROP } from "../libs/Constants.sol";
 
 /// @title Business Card interface.
 /// @dev Interface of the NFT Business Card smart contract.
