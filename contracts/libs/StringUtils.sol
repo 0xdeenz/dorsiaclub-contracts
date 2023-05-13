@@ -39,7 +39,7 @@ library StringUtils {
 
     /// @dev Validates the other external properties of the Business Card
     /// @param cardProperties: External values for the Business Card.
-    function validateOtherProperties(IBusinessCard.CardProperties calldata cardProperties) internal pure returns (bool) {
+    function validateOtherProperties(CardProperties calldata cardProperties) internal pure returns (bool) {
         if(
             bytes(cardProperties.twitterAccount).length < 15 &&
             bytes(cardProperties.telegramAccount).length < 32 &&
