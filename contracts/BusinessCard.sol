@@ -31,17 +31,11 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     // Business Card Marketplace address
     address private _marketplaceAddress;
-
-    bool public saleStarted;
-
-    // Maximum number of Business Cards there will ever be
-    uint256 public constant MAX_SUPPLY = 5000;
-    // Token mint price
-    uint256 public mintPrice = 0.01 ether;
+ 
     // Token URI update / swap price
     uint256 public updatePrice = 0.002 ether;
-    // Oracle update transaction gas price
-    uint256 public oraclePrice = 0.0005 ether;
+
+    bool public saleStarted;
 
     /// @dev Throws if the sale has not started.
     modifier activeSale() {
@@ -67,7 +61,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-getCard}
     function getCard(string calldata cardName, CardProperties calldata cardProperties) external payable override activeSale {
         if (totalSupply() >= MAX_SUPPLY) { revert SaleHasEnded(); }
-        if (msg.value < mintPrice) { revert PriceTooLow(); }
+        if (msg.value < MINT_PRICE) { revert PriceTooLow(); }
 
         if (!StringUtils.validateName(bytes(cardName))) { revert NameNotValid(); }
         if (_isNameReserved(cardName)) { revert NameIsTaken(); }
@@ -127,7 +121,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         emit CardDataSwapRequest(cardId1, cardId2, _cardStats[cardId1].genes, _cardStats[cardId2].genes);
 
         // Fund the server oracle with enough funds for the callback transaction
-        (bool success, ) = payable(_oracleAddress).call{value: oraclePrice}("");
+        (bool success, ) = payable(_oracleAddress).call{value: ORACLE_FEE}("");
         if (!success) { revert ValueTransferFailed(); }
     }   
 
@@ -165,7 +159,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     /// @dev See {IBusinessCard-modifyUpdatePrice}
     function modifyUpdatePrice(uint256 newUpdatePrice) external override onlyOwner {
-        if (newUpdatePrice < oraclePrice) { revert UpdatePriceMustCoverOracleFee(); }
+        if (newUpdatePrice < ORACLE_FEE) { revert UpdatePriceMustCoverOracleFee(); }
         updatePrice = newUpdatePrice;
     }
 
@@ -225,7 +219,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         requests[cardId] = true;
 
         // Fund the server oracle with enough funds for the callback transaction
-        (bool success, ) = payable(_oracleAddress).call{value: oraclePrice}("");
+        (bool success, ) = payable(_oracleAddress).call{value: ORACLE_FEE}("");
         if (!success) { revert ValueTransferFailed(); }
         
         emit CardDataUpdateRequest(cardId, genes, cardName, cardProperties);
