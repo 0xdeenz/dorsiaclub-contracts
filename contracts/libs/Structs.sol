@@ -23,10 +23,9 @@ struct CardProperties {
 
 /// @dev Defines a Business Card listing in the marketplace. 
 struct CardListing {
-    uint256 itemId;
-    uint256 tokenId;
-    address payable seller;
-    address payable owner;
+    uint256 cardId;
+    address seller;
+    address buyer;
     uint256 price;
     bool isSold;
     bool isCancelled;
