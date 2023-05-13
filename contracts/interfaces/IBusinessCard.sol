@@ -98,11 +98,11 @@ interface IBusinessCard is IERC721Enumerable {
 
     /// @dev Returns wheter the given name is reserved.
     /// @param name: Name to be checked.
-    /// @return bool: Whether the name is reserved.
+    /// @return isReserved: Whether the name is reserved.
     function isNameReserved(string calldata name) external view returns (bool);
 
     /// @dev Returns the stats of the given Business Card.
     /// @param cardId: ID of the Business Card.
-    /// @return Card: Name and genes of the Business Card.
+    /// @return card: Name and genes of the Business Card.
     function getCardStats(uint256 cardId) external view returns (Card memory);
 }

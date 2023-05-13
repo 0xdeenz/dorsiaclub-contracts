@@ -38,7 +38,7 @@ interface ICardMarketplace {
     /// @dev Lists a Business Card on the Marketplace.
     /// @param cardId: ID of the Business Card that is being listed.
     /// @param price: Price the Business Card is being listed for.
-    /// @return uint256: ID of the listing that was created.
+    /// @return itemId: ID of the listing that was created.
     function createCardListing(uint256 cardId, uint256 price) external returns (uint256);
 
     /// @dev Cancels a Business Card listing.
@@ -52,18 +52,18 @@ interface ICardMarketplace {
     function buyListedCard(uint256 itemId, string calldata newCardName, CardProperties calldata newCardProperties) external payable;
 
     /// @dev Gets the Business Card listings that are currently active in the Marketplace.
-    /// @return CardListing[]: listings that are currently active.
+    /// @return cardListings: listings that are currently active.
     function getMarketListings() external view returns(CardListing[] memory);
     
     /// @dev Gets the Business Card listings related to an address either as a buyer or a seller.
     /// @param account: Address of interest.
     /// @param isSeller: Boolean value indicating whether to find the listings for this address as a seller or as a buyer.
-    /// @return CardListing[]: Business Card listings related to this address.
+    /// @return cardListings: Business Card listings related to this address.
     function getMarketListingsByAddress(address account, bool isSeller) external view returns (CardListing[] memory);
 
     /// @dev Gets the latest listing in the marketplace for a Business Card. Reverts if the card was never listed.
     /// @param cardId: ID of the Business Card.
-    /// @return CardListing: Last Marketplace listing for this Business Card.
+    /// @return cardListing: Last Marketplace listing for this Business Card.
     function getLatestListingByCard(uint256 cardId) external view returns (CardListing memory);
 
     /// @dev Starts the Business Card Marketplace.
