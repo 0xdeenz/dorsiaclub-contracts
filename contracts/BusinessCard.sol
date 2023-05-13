@@ -174,7 +174,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         uint balance = address(this).balance;
         (bool success, ) = payable(msg.sender).call{value: balance}("");
 
-        if (!success) { revert ValueTransferFailed(); }
+        if (!success) { revert(); }
     }
 
     /// @dev See {IBusinessCard-isNameReserved}

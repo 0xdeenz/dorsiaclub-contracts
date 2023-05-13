@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
+import { Card, CardProperties } from "../libs/Structs.sol";
 
 /// @title Business Card interface.
 /// @dev Interface of the NFT Business Card smart contract.
@@ -29,26 +30,6 @@ interface IBusinessCard is IERC721Enumerable {
     error ValueTransferFailed();
 
     error CardDoesNotExist();
-    
-    /// @dev Defines the values for the Business Card that get stored on-chain.
-    struct Card {
-        /// Unique name that is assigned to this Business Card
-        string name;
-        /// Random integer that encodes the characteristics of the Business Card and is generated at mint time.
-        uint256 genes;
-    }
-
-    /// @dev Defines the values for the Business Card that are not stored on-chain, and are instead sent to the oracle. 
-    struct CardProperties {
-        string position;
-        string twitterAccount;
-        string telegramAccount;
-        string telegramGroup;
-        uint256 discordAccount;
-        string discordGroup;
-        string githubUsername;
-        string website;
-    }
 
     /// @dev Emitted when a new request is made to the oracle to change a Business Card's URI.
     /// @param cardId: ID of the Business Card.
