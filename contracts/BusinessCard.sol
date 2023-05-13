@@ -5,6 +5,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "./DorsiaToken.sol";
 import "./interfaces/IBusinessCard.sol";
 import "./libs/StringUtils.sol";
 
@@ -31,6 +32,8 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     // Business Card Marketplace address
     address private _marketplaceAddress;
+    // Dorsia Club Token contract
+    DorsiaClubToken private DCT;
 
     bool public saleStarted;
 
@@ -53,6 +56,8 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     constructor(string memory defaultURI, address oracleAddress) ERC721("Business Card", "CARD") {
         _defaultURI = defaultURI;
         _oracleAddress = oracleAddress;
+
+        DCT = new DorsiaClubToken();
     }
 
     /// @dev See {IBusinessCard-getCard}
@@ -76,6 +81,8 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         _cardStats[cardId] = Card(cardName, genes);
         _safeMint(_msgSender(), cardId);
         _updateTokenURI(cardId, genes, cardName, cardProperties);
+
+        DCT.transfer(_msgSender(), DCT_AIRDROP);
     }
 
     /// @dev See {IBusinessCard-updateCardData}
