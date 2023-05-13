@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IDorsiaClubToken.sol";
 
 contract DorsiaClubToken is IDorsiaClubToken, ERC20Burnable, Ownable {
+    /// @dev Initializes the Dorsia Club Token smart contract.
     constructor() ERC20("Dorsia Club Token", "DCT") {
         _mint(msg.sender, DCT_AIRDROP_SUPPLY * 10 ** decimals());
         _mint(tx.origin, (MAX_DCT_SUPPLY - DCT_AIRDROP_SUPPLY) * 10 ** decimals());
