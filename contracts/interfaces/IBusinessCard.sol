@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
 import { Card, CardProperties } from "../libs/Structs.sol";
-import { MAX_SUPPLY, MINT_PRICE, ORACLE_FEE } from "../libs/Constants.sol";
+import { MAX_SUPPLY, MINT_PRICE, UPDATE_PRICE, ORACLE_FEE } from "../libs/Constants.sol";
 
 /// @title Business Card interface.
 /// @dev Interface of the NFT Business Card smart contract.
@@ -92,10 +92,6 @@ interface IBusinessCard is IERC721Enumerable {
     /// @dev Sets up a Marketplace allowing the native trading of Business Cards.
     /// @param marketplaceAddress: New address of the marketplace.
     function setMarketplace(address marketplaceAddress) external;
-
-    /// @dev Changes the Business Card update price.
-    /// @param newUpdatePrice: New price for updating Business Cards.
-    function modifyUpdatePrice(uint256 newUpdatePrice) external;
 
     /// @dev Withdraw balance from this contract to fund the dev's tungsten cube collection.
     function devWorksHard() external;

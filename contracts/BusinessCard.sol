@@ -31,9 +31,6 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     // Business Card Marketplace address
     address private _marketplaceAddress;
- 
-    // Token URI update / swap price
-    uint256 public updatePrice = 0.002 ether;
 
     bool public saleStarted;
 
@@ -84,7 +81,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-updateCardData}
     function updateCardData(uint256 cardId, string calldata newCardName, CardProperties calldata newCardProperties) external payable override activeSale {
         if (!_isApprovedOrOwner(_msgSender(), cardId)) { revert CallerMustBeOwnerOrApproved(); }
-        if (msg.value < updatePrice && _msgSender() != _marketplaceAddress) { revert PriceTooLow(); }
+        if (msg.value < UPDATE_PRICE && _msgSender() != _marketplaceAddress) { revert PriceTooLow(); }
 
         if (bytes(newCardName).length != 0 && !StringUtils.validateName(bytes(newCardName))) { revert NameNotValid(); }
         if (_isNameReserved(newCardName)) { revert NameIsTaken(); }
@@ -104,7 +101,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-swapCardData}
     function swapCardData(uint256 cardId1, uint256 cardId2) external payable override activeSale {
         if (!_isApprovedOrOwner(_msgSender(), cardId1) || !_isApprovedOrOwner(_msgSender(), cardId2)) { revert CallerMustBeOwnerOrApproved(); }
-        if (msg.value < updatePrice) { revert PriceTooLow(); }
+        if (msg.value < UPDATE_PRICE) { revert PriceTooLow(); }
 
         if (requests[cardId1] || requests[cardId2]) { revert RequestBeingProcessed(); }
 
@@ -155,12 +152,6 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-setMarketplace}
     function setMarketplace(address marketplaceAddress) external override onlyOwner {
         _marketplaceAddress = marketplaceAddress;
-    }
-
-    /// @dev See {IBusinessCard-modifyUpdatePrice}
-    function modifyUpdatePrice(uint256 newUpdatePrice) external override onlyOwner {
-        if (newUpdatePrice < ORACLE_FEE) { revert UpdatePriceMustCoverOracleFee(); }
-        updatePrice = newUpdatePrice;
     }
 
     /// @dev See {IBusinessCard-devWorksHard}
