@@ -1,4 +1,5 @@
 //SPDX-License-Identifier: Unlicense
+
 pragma solidity ^0.8.4;
 
 /// @dev Defines the values for the Business Card that get stored on-chain.
@@ -14,9 +15,6 @@ struct CardProperties {
     string position;
     string twitterAccount;
     string telegramAccount;
-    string telegramGroup;
-    uint256 discordAccount;
-    string discordGroup;
     string githubUsername;
     string website;
 }
@@ -29,4 +27,15 @@ struct CardListing {
     uint256 price;
     bool isSold;
     bool isCancelled;
+}
+
+/// @dev Defines a Business Card meeting
+struct Meeting {
+    uint256 meetingStart;
+    uint256 meetingEnd;
+    uint256 betAmount;
+    uint256 participants;
+    uint256[] cardIds;
+    uint256[] winningChances;
+    address winner;
 }
