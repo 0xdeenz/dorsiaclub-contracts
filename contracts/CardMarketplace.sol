@@ -160,7 +160,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     /// @dev See {ICardMarketplace-withdraw}
     function withdraw() external override onlyOwner {
         uint balance = address(this).balance;
-        (bool success, ) = payable(msg.sender).call{value: balance}("");
+        (bool success, ) = payable(msg.sender).call{ value: balance }("");
 
         if (!success) { revert(); }
     }

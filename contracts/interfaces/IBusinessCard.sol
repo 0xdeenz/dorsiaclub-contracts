@@ -105,4 +105,9 @@ interface IBusinessCard is IERC721Enumerable {
     /// @param cardId: ID of the Business Card.
     /// @return card: Name and genes of the Business Card.
     function getCardStats(uint256 cardId) external view returns (Card memory);
+
+    /// @dev Returns the stats of the given Business Card.
+    /// @param cardId: ID of the Business Card.
+    /// @return genes: Genes of the Business Card.
+    function getCardGenes(uint256 cardId) external view returns (uint256);
 }

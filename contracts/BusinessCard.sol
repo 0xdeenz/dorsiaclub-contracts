@@ -7,10 +7,10 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./DorsiaToken.sol";
 import "./interfaces/IBusinessCard.sol";
-import "./libs/StringUtils.sol";
+import "./libs/Utils.sol";
 
 contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
-    using SafeMath for uint256;
+    using StringUtils for bytes;
 
     /// @dev Gets a Business Card ID and returns the corresponding URI.
     mapping (uint256 => string) private _cardURIs;
@@ -65,9 +65,9 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         if (totalSupply() >= MAX_SUPPLY) { revert SaleHasEnded(); }
         if (msg.value < MINT_PRICE) { revert PriceTooLow(); }
 
-        if (!StringUtils.validateName(bytes(cardName))) { revert NameNotValid(); }
+        if (!bytes(cardName).validateName()) { revert NameNotValid(); }
         if (_isNameReserved(cardName)) { revert NameIsTaken(); }
-        if (!StringUtils.validatePosition(bytes(cardProperties.position))) { revert PositionNotValid(); }
+        if (!bytes(cardProperties.position).validatePosition()) { revert PositionNotValid(); }
 
         uint256 cardId = totalSupply() + 1;
 
@@ -77,7 +77,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         uint256 genes = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, cardName, cardId))) % 10**30;
 
         // Generating a new Business Card
-        _toggleNameReserve(cardName, true);
+        _nameReserved[bytes(cardName).toLower()] = true;
         _cardStats[cardId] = Card(cardName, genes);
         _safeMint(_msgSender(), cardId);
         _updateTokenURI(cardId, genes, cardName, cardProperties);
@@ -90,14 +90,14 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         if (!_isApprovedOrOwner(_msgSender(), cardId)) { revert CallerMustBeOwnerOrApproved(); }
         if (msg.value < UPDATE_PRICE && _msgSender() != _marketplaceAddress) { revert PriceTooLow(); }
 
-        if (bytes(newCardName).length != 0 && !StringUtils.validateName(bytes(newCardName))) { revert NameNotValid(); }
+        if (bytes(newCardName).length != 0 && !bytes(newCardName).validateName()) { revert NameNotValid(); }
         if (_isNameReserved(newCardName)) { revert NameIsTaken(); }
-        if (bytes(newCardProperties.position).length != 0 && !StringUtils.validatePosition(bytes(newCardProperties.position))) { revert PositionNotValid(); }
+        if (bytes(newCardProperties.position).length != 0 && !bytes(newCardProperties.position).validatePosition()) { revert PositionNotValid(); }
 
         // Only change the name if specified
         if (bytes(newCardName).length > 0) {
-            _toggleNameReserve(_cardStats[cardId].name, false);
-            _toggleNameReserve(newCardName, true);
+            _nameReserved[bytes(_cardStats[cardId].name).toLower()] = false;
+            _nameReserved[bytes(newCardName).toLower()] = true;
             
             _cardStats[cardId].name = newCardName;
         }
@@ -164,7 +164,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-devWorksHard}
     function devWorksHard() external override onlyOwner {
         uint balance = address(this).balance;
-        (bool success, ) = payable(msg.sender).call{value: balance}("");
+        (bool success, ) = payable(msg.sender).call{ value: balance }("");
 
         if (!success) { revert(); }
     }
@@ -177,6 +177,11 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-getCardStats}
     function getCardStats(uint256 cardId) external override view existingCards(cardId) returns (Card memory) {
         return _cardStats[cardId];
+    }
+
+    /// @dev See {IBusinessCard-getCardGenes}
+    function getCardGenes(uint256 cardId) external override view existingCards(cardId) returns (uint256) {
+        return _cardStats[cardId].genes;
     }
 
     /// @dev See {IERC721Metadata-tokenURI}
@@ -192,14 +197,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     /// @dev See {IBusinessCard-isNameReserved}
     function _isNameReserved(string calldata name) internal view returns (bool) {
-        return _nameReserved[StringUtils.toLower(name)];
-    }
-
-    /// @dev Reserves or unreserves the name depending on `isReserve` is set to true.
-    /// @param cardName: Name to be reserved or unreserved.
-    /// @param isReserve: Whether to reserve the name or unreserve it.
-    function _toggleNameReserve(string memory cardName, bool isReserve) internal {
-        _nameReserved[StringUtils.toLower(cardName)] = isReserve;
+        return _nameReserved[bytes(name).toLower()];
     }
 
     /// @dev Emits an event for the oracle to update a certain token URI with the newly defined Card struct.
@@ -208,7 +206,12 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @param cardName: Unique name assigned to this Business Card.
     /// @param cardProperties: Values for this Business Card that are not stored on-chain.
     function _updateTokenURI(uint256 cardId, uint256 genes, string calldata cardName, CardProperties calldata cardProperties) internal {
-        if (!StringUtils.validateOtherProperties(cardProperties)) { revert PropertiesNotValid(); }
+        if (
+            bytes(cardProperties.twitterAccount).length > 15 ||
+            bytes(cardProperties.telegramAccount).length > 32 ||
+            bytes(cardProperties.githubUsername).length > 39 ||
+            bytes(cardProperties.website).length > 50
+        ) { revert PropertiesNotValid(); }
     
         // TODO: this necessary? require(_exists(_cardId));
 
