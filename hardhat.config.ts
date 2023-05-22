@@ -13,6 +13,10 @@ import { HardhatUserConfig } from "hardhat/config"
 import { resolve } from "path"
 import { config } from "./package.json"
 
+import "./tasks/accounts.ts"
+import "./tasks/deploy-business-card.ts"
+import "./tasks/deploy-meeting-room.ts"
+
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
 
 const hardhatConfig: HardhatUserConfig = {
@@ -22,6 +26,12 @@ const hardhatConfig: HardhatUserConfig = {
         tests: config.paths.tests,
         cache: config.paths.cache,
         artifacts: config.paths.build.contracts
+    },
+    networks: {
+        hardhat: {
+            chainId: 1337,
+            allowUnlimitedContractSize: true
+        },
     },
     gasReporter: {
         currency: "USD",
