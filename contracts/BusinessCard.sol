@@ -21,18 +21,18 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev Gets a name and returns whether it was already reserved. Reserved names are stored in lowercase.
     mapping (string => bool) private _nameReserved;
 
-    // Default URI
+    // Default URI.
     string private _defaultURI;
 
-    // Address of the oracle
+    // Address of the oracle.
     address private _oracleAddress;
     
     /// @dev Gets a request ID and returns wheter it was processed by the oracle.
     mapping(uint256 => bool) public requests;
 
-    // Business Card Marketplace address
+    // Business Card Marketplace address.
     address private _marketplaceAddress;
-    // Dorsia Club Token contract
+    // Dorsia Club Token contract.
     DorsiaClubToken private DCT;
 
     bool public saleStarted;

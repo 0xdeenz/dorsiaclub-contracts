@@ -10,13 +10,13 @@ import "./libs/CardMaestro.sol";
 contract MeetingRoom is IMeetingRoom, Ownable {
     using CardMaestro for uint256;
 
-    /// Business Card smart contract
+    /// Business Card smart contract.
     IBusinessCard immutable businessCardContract;
 
-    /// Total number of meeting rooms that have been created
+    /// Total number of meeting rooms that have been created.
     uint256 public totalMeetingRooms;
 
-    /// @dev Gets a meeting room ID and returns the corresponding `Meeting` struct
+    /// @dev Gets a meeting room ID and returns the corresponding `Meeting` struct.
     mapping(uint256 => Meeting) private _meetingRooms;
 
     /// @dev Gets a meeting room ID and an address and returns its card commitment.

@@ -10,20 +10,22 @@ import "./interfaces/ICardMarketplace.sol";
 contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     
-    // Number of Business Cards that have been listed in the marketplace
+    // Number of Business Cards that have been listed in the marketplace.
     uint256 public totalListings;
-    // Numer of Business Card listings that have been filled
+    // Numer of Business Card listings that have been filled.
     uint256 public filledListings;
-    // Number of Business Card listings that have been cancelled
+    // Number of Business Card listings that have been cancelled.
     uint256 public cancelledListings;
     
-    // Business Card smart contract
+    // Business Card smart contract.
     IBusinessCard immutable businessCardContract;
-    // Minimum listing price, equal to the update price in bCard
+    // Minimum listing price, equal to the update price in bCard.
     uint256 public minimumPrice = 0.05 ether;
 
-    bool public saleStarted;
+    // Whether the trading of Business Cards is currently active, which starts as true.
+    bool public saleStarted = true;
 
+    /// @dev Gets a listing ID and returns the corresponding CardListing struct.
     mapping(uint256 => CardListing) private _idToCardListing;
 
     /// @dev Initializes the Card Marketplace smart contract.
