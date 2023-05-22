@@ -27,6 +27,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     mapping(uint256 => CardListing) private _idToCardListing;
 
     /// @dev Initializes the Card Marketplace smart contract.
+    /// @param businessCardAddress: Address for the Business Card smart contract.
     constructor(address businessCardAddress) {
         businessCardContract = IBusinessCard(businessCardAddress);
     }

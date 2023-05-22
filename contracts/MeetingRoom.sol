@@ -22,9 +22,10 @@ contract MeetingRoom is IMeetingRoom, Ownable {
     /// @dev Gets a meeting room ID and an address and returns its card commitment.
     mapping(uint256 => mapping(address => uint256)) private _cardCommitments;
 
-    /// @dev Initializes the Meeting Room smart contract
-    constructor(address businessCard) {
-        businessCardContract = IBusinessCard(businessCard);
+    /// @dev Initializes the Meeting Room smart contract.
+    /// @param businessCardAddress: Address for the Business Card smart contract.
+    constructor(address businessCardAddress) {
+        businessCardContract = IBusinessCard(businessCardAddress);
     }
 
     /// @dev See {IMeetingRoom-createMeetingRoom}
