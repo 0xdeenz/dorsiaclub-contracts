@@ -53,10 +53,15 @@ task("deploy:business-card", "Deploys the Business Card smart contract")
                 if (logs) {
                     console.log("Card Marketplace connected to Business Card smart contract and started")
                 }
-            }
 
-            return {
-                businessCardAddress: businessCard.address
+                return {
+                    businessCardAddress: businessCard.address,
+                    cardMarketplaceAddress: cardMarketplace.address
+                }
+            } else {
+                return {
+                    businessCardAddress: businessCard.address
+                }
             }
         }
     )

@@ -20,5 +20,9 @@ task("deploy:meeting-room", "Deploys the Meeting Room smart contract")
             if (logs) {
                 console.log("MeetingRoom smart contract deployed to: ", meetingRoom.address)
             }
+
+            return {
+                meetingRoomAddress: meetingRoom.address
+            }
         }
     )
