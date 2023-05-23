@@ -1,6 +1,7 @@
 import { task, types } from "hardhat/config"
 
 task("deploy:business-card", "Deploys the Business Card smart contract")
+    .addParam<string>("baseUri", "Base URI for all Business Cards.")
     .addParam<string>("defaultUri", "Default URI for unminted/unprocessed Business Cards.")
     .addParam<string>("oracleAddress", "Initial address for the oracle.")
     .addOptionalParam<boolean>("startSale", "Starts the sale after deployment", true, types.boolean)
@@ -9,6 +10,7 @@ task("deploy:business-card", "Deploys the Business Card smart contract")
     .setAction(
         async (
             {
+                baseUri,
                 defaultUri,
                 oracleAddress,
                 startSale,
@@ -19,7 +21,7 @@ task("deploy:business-card", "Deploys the Business Card smart contract")
         ): Promise<any> => {
             const BusinessCardFactory = await ethers.getContractFactory("BusinessCard")
 
-            const businessCard = await BusinessCardFactory.deploy(defaultUri, oracleAddress)
+            const businessCard = await BusinessCardFactory.deploy(baseUri, defaultUri, oracleAddress)
             
             await businessCard.deployed()
 
