@@ -23,8 +23,12 @@ task("deploy:business-card", "Deploys the Business Card smart contract")
             
             await businessCard.deployed()
 
+            const dctAddress = await businessCard.DCT()
+
             if (logs) {
                 console.log("BusinessCard smart contract deployed to: ", businessCard.address)
+                
+                console.log("BusinessCard deployed DCT smart contract to: ", dctAddress)
             }
 
             if (startSale) {
@@ -56,11 +60,13 @@ task("deploy:business-card", "Deploys the Business Card smart contract")
 
                 return {
                     businessCardAddress: businessCard.address,
+                    dctAddress,
                     cardMarketplaceAddress: cardMarketplace.address
                 }
             } else {
                 return {
-                    businessCardAddress: businessCard.address
+                    businessCardAddress: businessCard.address,
+                    dctAddress
                 }
             }
         }
