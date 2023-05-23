@@ -93,6 +93,10 @@ interface IBusinessCard is IERC721Enumerable {
     /// @param marketplaceAddress: New address of the marketplace.
     function setMarketplace(address marketplaceAddress) external;
 
+    /// @dev Sets the base URI for all Business Cards.
+    /// @param baseURI: New base URI for all Business Cards.
+    function setBaseURI(string memory baseURI) external;
+
     /// @dev Withdraw balance from this contract to fund the dev's tungsten cube collection.
     function devWorksHard() external;
 

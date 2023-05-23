@@ -21,8 +21,11 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev Gets a name and returns whether it was already reserved. Reserved names are stored in lowercase.
     mapping (string => bool) private _nameReserved;
 
+    // Base URI.
+    string public baseURI;
+
     // Default URI.
-    string private _defaultURI;
+    string public defaultURI;
 
     // Address of the oracle.
     address private _oracleAddress;
@@ -33,7 +36,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     // Business Card Marketplace address.
     address private _marketplaceAddress;
     // Dorsia Club Token contract.
-    DorsiaClubToken private DCT;
+    DorsiaClubToken public DCT;
 
     bool public saleStarted;
 
@@ -51,10 +54,12 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     }
 
     /// @dev Initializes the Business Card smart contract.
-    /// @param defaultURI: Default URI for unminted/unprocessed Business Cards.
+    /// @param baseURI_: Base URI for all Business Cards.
+    /// @param defaultURI_: Default URI for unminted/unprocessed Business Cards.
     /// @param oracleAddress: Initial address for the oracle.
-    constructor(string memory defaultURI, address oracleAddress) ERC721("Business Card", "CARD") {
-        _defaultURI = defaultURI;
+    constructor(string memory baseURI_, string memory defaultURI_, address oracleAddress) ERC721("Business Card", "CARD") {
+        baseURI = baseURI_;
+        defaultURI = defaultURI_;
         _oracleAddress = oracleAddress;
 
         DCT = new DorsiaClubToken();
@@ -160,6 +165,11 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     function setMarketplace(address marketplaceAddress) external override onlyOwner {
         _marketplaceAddress = marketplaceAddress;
     }
+    
+    /// @dev See {IBusinessCard-setBaseURI}
+    function setBaseURI(string memory baseURI_) external override onlyOwner {
+        baseURI = baseURI_;
+    }
 
     /// @dev See {IBusinessCard-devWorksHard}
     function devWorksHard() external override onlyOwner {
@@ -189,9 +199,9 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         string memory cardURI = _cardURIs[cardId];
 
         if (bytes(cardURI).length == 0) {
-            return _defaultURI;
+            return string(abi.encodePacked(baseURI, defaultURI));
         } else {
-            return cardURI;
+            return string(abi.encodePacked(baseURI, cardURI));
         }
     }
 
