@@ -60,6 +60,8 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     constructor(string memory baseURI_, string memory defaultURI_, address oracleAddress_) ERC721("Business Card", "CARD") {
         baseURI = baseURI_;
         defaultURI = defaultURI_;
+
+        if (oracleAddress == address(0)) { revert (); }
         oracleAddress = oracleAddress_;
 
         DCT = new DorsiaClubToken();

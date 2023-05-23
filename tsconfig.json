@@ -8,6 +8,6 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["tasks/**/*", "test/**/*", "build/**/*", "typechain-types/**/*"],
+    "include": ["./tasks", "./tests", "./build", "./typechain-types"],
     "files": ["hardhat.config.ts"]
 }
