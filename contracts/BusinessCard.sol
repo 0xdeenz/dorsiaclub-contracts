@@ -28,7 +28,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     string public defaultURI;
 
     // Address of the oracle.
-    address private _oracleAddress;
+    address public oracleAddress;
     
     /// @dev Gets a request ID and returns wheter it was processed by the oracle.
     mapping(uint256 => bool) public requests;
@@ -56,11 +56,11 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev Initializes the Business Card smart contract.
     /// @param baseURI_: Base URI for all Business Cards.
     /// @param defaultURI_: Default URI for unminted/unprocessed Business Cards.
-    /// @param oracleAddress: Initial address for the oracle.
-    constructor(string memory baseURI_, string memory defaultURI_, address oracleAddress) ERC721("Business Card", "CARD") {
+    /// @param oracleAddress_: Initial address for the oracle.
+    constructor(string memory baseURI_, string memory defaultURI_, address oracleAddress_) ERC721("Business Card", "CARD") {
         baseURI = baseURI_;
         defaultURI = defaultURI_;
-        _oracleAddress = oracleAddress;
+        oracleAddress = oracleAddress_;
 
         DCT = new DorsiaClubToken();
     }
@@ -130,13 +130,13 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         emit CardDataSwapRequest(cardId1, cardId2, _cardStats[cardId1].genes, _cardStats[cardId2].genes);
 
         // Fund the server oracle with enough funds for the callback transaction
-        (bool success, ) = payable(_oracleAddress).call{value: ORACLE_FEE}("");
+        (bool success, ) = payable(oracleAddress).call{value: ORACLE_FEE}("");
         if (!success) { revert ValueTransferFailed(); }
     }   
 
     /// @dev See {IBusinessCard-startSale}
     function startSale() external override onlyOwner {
-        if (_oracleAddress == address(0)) { revert OracleIsNotDefined(); }
+        if (oracleAddress == address(0)) { revert OracleIsNotDefined(); }
         saleStarted = true;
     }
 
@@ -158,7 +158,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     /// @dev See {IBusinessCard-setOracle}
     function setOracle(address oracleAddress) external override onlyOwner {
-        _oracleAddress = oracleAddress;
+        oracleAddress = oracleAddress;
     }
 
     /// @dev See {IBusinessCard-setMarketplace}
@@ -230,7 +230,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         requests[cardId] = true;
 
         // Fund the server oracle with enough funds for the callback transaction
-        (bool success, ) = payable(_oracleAddress).call{value: ORACLE_FEE}("");
+        (bool success, ) = payable(oracleAddress).call{value: ORACLE_FEE}("");
         if (!success) { revert ValueTransferFailed(); }
         
         emit CardDataUpdateRequest(cardId, genes, cardName, cardProperties);
@@ -238,7 +238,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     /// @dev Updates a certain token URI and clears the corresponding update request.
     function _callback(uint256 cardId, string memory cardURI) internal {
-        if (_msgSender() != _oracleAddress) { revert CallerMustBeOracle(); }
+        if (_msgSender() != oracleAddress) { revert CallerMustBeOracle(); }
         if (!requests[cardId]) { revert RequestNotInPendingList(); }
 
         _cardURIs[cardId] = cardURI;
