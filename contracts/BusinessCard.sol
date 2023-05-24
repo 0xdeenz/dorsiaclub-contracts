@@ -34,7 +34,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     mapping(uint256 => bool) public requests;
 
     // Business Card Marketplace address.
-    address private _marketplaceAddress;
+    address private marketplaceAddress;
     // Dorsia Club Token contract.
     DorsiaClubToken public DCT;
 
@@ -60,8 +60,6 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     constructor(string memory baseURI_, string memory defaultURI_, address oracleAddress_) ERC721("Business Card", "CARD") {
         baseURI = baseURI_;
         defaultURI = defaultURI_;
-
-        if (oracleAddress == address(0)) { revert (); }
         oracleAddress = oracleAddress_;
 
         DCT = new DorsiaClubToken();
@@ -78,7 +76,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
         uint256 cardId = totalSupply() + 1;
 
-        // Generating the random genes, defined by a 26 digit number
+        // Generating the random genes, defined by a 30 digit number
         // The server oracle will convert the genes to a string and add leading zeros, as tokenURIs are generated with this constraint
         // TODO: ~~improve make it harder to exploit
         uint256 genes = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, cardName, cardId))) % 10**30;
@@ -95,7 +93,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-updateCardData}
     function updateCardData(uint256 cardId, string calldata newCardName, CardProperties calldata newCardProperties) external payable override activeSale {
         if (!_isApprovedOrOwner(_msgSender(), cardId)) { revert CallerMustBeOwnerOrApproved(); }
-        if (msg.value < UPDATE_PRICE && _msgSender() != _marketplaceAddress) { revert PriceTooLow(); }
+        if (msg.value < UPDATE_PRICE && _msgSender() != marketplaceAddress) { revert PriceTooLow(); }
 
         if (bytes(newCardName).length != 0 && !bytes(newCardName).validateName()) { revert NameNotValid(); }
         if (_isNameReserved(newCardName)) { revert NameIsTaken(); }
@@ -165,7 +163,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
 
     /// @dev See {IBusinessCard-setMarketplace}
     function setMarketplace(address marketplaceAddress) external override onlyOwner {
-        _marketplaceAddress = marketplaceAddress;
+        marketplaceAddress = marketplaceAddress;
     }
     
     /// @dev See {IBusinessCard-setBaseURI}
