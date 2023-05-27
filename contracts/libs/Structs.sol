@@ -15,7 +15,7 @@ struct CardProperties {
     string position;
     string twitterAccount;
     string telegramAccount;
-    string githubUsername;
+    string githubAccount;
     string website;
 }
 

@@ -219,7 +219,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         if (
             bytes(cardProperties.twitterAccount).length > 15 ||
             bytes(cardProperties.telegramAccount).length > 32 ||
-            bytes(cardProperties.githubUsername).length > 39 ||
+            bytes(cardProperties.githubAccount).length > 39 ||
             bytes(cardProperties.website).length > 50
         ) { revert PropertiesNotValid(); }
     
