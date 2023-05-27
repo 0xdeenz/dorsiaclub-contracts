@@ -35,9 +35,9 @@ interface IBusinessCard is IERC721Enumerable {
     /// @dev Emitted when a new request is made to the oracle to change a Business Card's URI.
     /// @param cardId: ID of the Business Card.
     /// @param genes: Random integer encoding the characteristics of this Business Card.
-    /// @param name: Unique name assigned to this Business Card.
+    /// @param cardName: Unique name assigned to this Business Card.
     /// @param cardProperties: Values for this Business Card that are not stored on-chain.
-    event CardDataUpdateRequest(uint256 cardId, uint256 genes, string name, CardProperties cardProperties);
+    event CardDataUpdateRequest(uint256 cardId, uint256 genes, string cardName, CardProperties cardProperties);
 
     /// @dev Emitted when a new request is made to the oracle to change two Business Card's URI by swapping their name, position and properties.
     /// @param cardId1: ID of the first Business Card.
