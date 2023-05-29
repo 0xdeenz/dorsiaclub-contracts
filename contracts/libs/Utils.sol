@@ -14,25 +14,25 @@ library StringUtils {
     /// @dev Checks that the name string is valid: alphanumeric with some special characters and spaces without leading or trailing space and under `MAX_NAME_CHARACTERS` characters.
     /// @param stringBytes: Bytes array for the name string. 
     function validateName(bytes calldata stringBytes) internal pure returns (bool) {
-        if (!validateStringBytes(stringBytes)) { revert NonValidCharacters(); }
-        
         if(
             stringBytes.length == 0 || stringBytes.length > MAX_NAME_CHARACTERS || stringBytes[0] == 0x20 || stringBytes[stringBytes.length - 1] == 0x20
         ) 
             return false;
         
+        if (!validateStringBytes(stringBytes)) { revert NonValidCharacters(); }
+
         return true;
     }
 
     /// @dev Checks that the position string is valid: alphanumeric with some special characters and spaces without leading or trailing space and under `MAX_POSITION_CHARACTERS` characters.
     /// @param stringBytes: Bytes array for the position string. 
     function validatePosition(bytes calldata stringBytes) internal pure returns (bool) {
-        if (!validateStringBytes(stringBytes)) { revert NonValidCharacters(); }
-        
         if(
             stringBytes.length == 0 || stringBytes.length > MAX_POSITION_CHARACTERS || stringBytes[0] == 0x20 || stringBytes[stringBytes.length - 1] == 0x20
         ) 
             return false;
+        
+        if (!validateStringBytes(stringBytes)) { revert NonValidCharacters(); }
         
         return true;
     }

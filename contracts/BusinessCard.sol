@@ -34,7 +34,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     mapping(uint256 => bool) public requests;
 
     // Business Card Marketplace address.
-    address private marketplaceAddress;
+    address public marketplaceAddress;
     // Dorsia Club Token contract.
     DorsiaClubToken public DCT;
 
@@ -87,7 +87,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         _safeMint(_msgSender(), cardId);
         _updateTokenURI(cardId, genes, cardName, cardProperties);
 
-        DCT.transfer(_msgSender(), DCT_AIRDROP);
+        DCT.transfer(_msgSender(), DCT_AIRDROP * 10 ** DCT.decimals());
     }
 
     /// @dev See {IBusinessCard-updateCardData}
@@ -157,18 +157,18 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     }
 
     /// @dev See {IBusinessCard-setOracle}
-    function setOracle(address oracleAddress) external override onlyOwner {
-        oracleAddress = oracleAddress;
+    function setOracle(address _oracleAddress) external override onlyOwner {
+        oracleAddress = _oracleAddress;
     }
 
     /// @dev See {IBusinessCard-setMarketplace}
-    function setMarketplace(address marketplaceAddress) external override onlyOwner {
-        marketplaceAddress = marketplaceAddress;
+    function setMarketplace(address _marketplaceAddress) external override onlyOwner {
+        marketplaceAddress = _marketplaceAddress;
     }
     
     /// @dev See {IBusinessCard-setBaseURI}
-    function setBaseURI(string memory baseURI_) external override onlyOwner {
-        baseURI = baseURI_;
+    function setBaseURI(string memory _baseURI) external override onlyOwner {
+        baseURI = _baseURI;
     }
 
     /// @dev See {IBusinessCard-devWorksHard}
@@ -223,8 +223,6 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
             bytes(cardProperties.website).length > 50
         ) { revert PropertiesNotValid(); }
     
-        // TODO: this necessary? require(_exists(_cardId));
-
         // Calls for updating the token can only be made if it is not being processed already
         if (requests[cardId]) { revert RequestBeingProcessed(); }
         requests[cardId] = true;
@@ -244,6 +242,6 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
         _cardURIs[cardId] = cardURI;
         delete requests[cardId];
 
-        emit CardURIUpdated(cardId, cardURI);
+        emit CardURIUpdated(cardId, string(abi.encodePacked(baseURI, cardURI)));
     }
 }
