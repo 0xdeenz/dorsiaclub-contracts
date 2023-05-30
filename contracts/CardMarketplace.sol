@@ -19,8 +19,6 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     
     // Business Card smart contract.
     IBusinessCard immutable businessCardContract;
-    // Minimum listing price, equal to the update price in bCard.
-    uint256 public minimumPrice = 0.05 ether;
 
     // Whether the trading of Business Cards is currently active, which starts as true.
     bool public marketplaceActive = true;
@@ -37,7 +35,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     /// @dev See {ICardMarketplace-createCardListing}
     function createCardListing(uint256 cardId, uint256 price) external override nonReentrant returns (uint256) {
         if (!marketplaceActive) { revert MarketplaceIsPaused(); }
-        if (price < minimumPrice) { revert PriceTooLow(); }
+        if (price < UPDATE_PRICE) { revert PriceTooLow(); }
 
         totalListings++;
 
