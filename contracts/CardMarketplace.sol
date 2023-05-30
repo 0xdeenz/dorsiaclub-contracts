@@ -23,7 +23,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     uint256 public minimumPrice = 0.05 ether;
 
     // Whether the trading of Business Cards is currently active, which starts as true.
-    bool public saleStarted = true;
+    bool public marketplaceActive = true;
 
     /// @dev Gets a listing ID and returns the corresponding CardListing struct.
     mapping(uint256 => CardListing) private _idToCardListing;
@@ -36,7 +36,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
 
     /// @dev See {ICardMarketplace-createCardListing}
     function createCardListing(uint256 cardId, uint256 price) external override nonReentrant returns (uint256) {
-        if (!saleStarted) { revert MarketplaceIsPaused(); }
+        if (!marketplaceActive) { revert MarketplaceIsPaused(); }
         if (price < minimumPrice) { revert PriceTooLow(); }
 
         totalListings++;
@@ -75,7 +75,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     
     /// @dev See {ICardMarketplace-buyListedCard}
     function buyListedCard(uint256 itemId, string calldata newCardName, CardProperties calldata newCardProperties) external payable override nonReentrant {
-        if (!saleStarted) { revert MarketplaceIsPaused(); }
+        if (!marketplaceActive) { revert MarketplaceIsPaused(); }
         
         uint256 price = _idToCardListing[itemId].price;
         uint256 cardId = _idToCardListing[itemId].cardId;
@@ -152,12 +152,12 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     
     /// @dev See {ICardMarketplace-startMarketplace}
     function startMarketplace() external override onlyOwner {
-        saleStarted = true;
+        marketplaceActive = true;
     }
     
     /// @dev See {ICardMarketplace-pauseMarketplace}
     function pauseMarketplace() external override onlyOwner {
-        saleStarted = false;
+        marketplaceActive = false;
     }
     
     /// @dev See {ICardMarketplace-withdraw}
