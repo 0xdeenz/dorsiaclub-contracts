@@ -18,7 +18,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     uint256 public cancelledListings;
     
     // Business Card smart contract.
-    IBusinessCard immutable businessCardContract;
+    IBusinessCard immutable businessCard;
 
     // Whether the trading of Business Cards is currently active, which starts as true.
     bool public marketplaceActive = true;
@@ -29,7 +29,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     /// @dev Initializes the Card Marketplace smart contract.
     /// @param businessCardAddress: Address for the Business Card smart contract.
     constructor(address businessCardAddress) {
-        businessCardContract = IBusinessCard(businessCardAddress);
+        businessCard = IBusinessCard(businessCardAddress);
     }
 
     /// @dev See {ICardMarketplace-createCardListing}
@@ -48,7 +48,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
             false
         );
 
-        businessCardContract.transferFrom(_msgSender(), address(this), cardId);
+        businessCard.transferFrom(businessCard.ownerOf(cardId), address(this), cardId);
 
         emit CardListingCreated(totalListings, cardId, _msgSender(), price);
 
@@ -66,7 +66,7 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
         _idToCardListing[itemId].isCancelled = true;
         cancelledListings++;
 
-        businessCardContract.transferFrom(address(this), _msgSender(), cardId);
+        businessCard.transferFrom(address(this), _msgSender(), cardId);
 
         emit CardListingCancelled(itemId, cardId);
     }
@@ -86,14 +86,14 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
         filledListings++;
 
         // Business Card update
-        businessCardContract.updateCardData{ value: ORACLE_FEE }(cardId, newCardName, newCardProperties);
+        businessCard.updateCardData{ value: ORACLE_FEE }(cardId, newCardName, newCardProperties);
 
         address seller = _idToCardListing[itemId].seller;
 
         (bool success, ) = payable(seller).call{value: price}("");
         if (!success) { revert ValueTransferFailed(); }
 
-        businessCardContract.transferFrom(address(this), _msgSender(), cardId);
+        businessCard.transferFrom(address(this), _msgSender(), cardId);
 
         emit CardListingFilled(itemId, cardId, seller, _msgSender(), price);
     }
