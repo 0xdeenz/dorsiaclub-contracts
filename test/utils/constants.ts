@@ -12,6 +12,8 @@ export const MAX_DCT_SUPPLY = utils.parseEther("2125556342");
 export const DCT_AIRDROP = utils.parseEther("212555");
 export const DCT_AIRDROP_SUPPLY = DCT_AIRDROP.mul(MAX_SUPPLY);
 
+export const MIN_LISTING_PRICE= utils.parseEther("0.001");
+
 export const MAXIMUM_MEETING_PARTICIPANTS = 10;
 export const MINIMUM_TIME_TO_MEETING_START = 1;
 export const MAXIMUM_TIME_TO_MEETING_START = 10;
