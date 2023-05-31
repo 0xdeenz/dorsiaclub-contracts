@@ -17,6 +17,9 @@ uint256 constant DCT_AIRDROP = 212_555;
 // Total $DCT allocation for airdrops
 uint256 constant DCT_AIRDROP_SUPPLY = DCT_AIRDROP * MAX_SUPPLY;
 
+// Minimum listing price for a Business Card in the marketplace
+uint256 constant MIN_LISTING_PRICE = 0.001 ether;
+
 // Maximum meeting participants; limitation arises from having to loop through an array when revealing cards
 uint256 constant MAXIMUM_MEETING_PARTICIPANTS = 10;
 // Minimum time, in minutes, that must be waited until a meeting starts

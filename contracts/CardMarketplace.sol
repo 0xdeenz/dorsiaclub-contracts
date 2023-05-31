@@ -26,6 +26,14 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     /// @dev Gets a listing ID and returns the corresponding CardListing struct.
     mapping(uint256 => CardListing) private _idToCardListing;
 
+    /// @dev Throws if the listing has been cancelled or filled.
+    /// @param itemId: ID of the listing.
+    modifier activeListing(uint256 itemId) {
+        if (_idToCardListing[itemId].isSold) { revert ListingWasFilled(); }
+        if (_idToCardListing[itemId].isCancelled) { revert ListingWasCancelled(); }
+        _;
+    }
+
     /// @dev Initializes the Card Marketplace smart contract.
     /// @param businessCardAddress: Address for the Business Card smart contract.
     constructor(address businessCardAddress) {
@@ -33,9 +41,9 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
     }
 
     /// @dev See {ICardMarketplace-createCardListing}
-    function createCardListing(uint256 cardId, uint256 price) external override nonReentrant returns (uint256) {
+    function createCardListing(uint256 cardId, uint256 price) external override nonReentrant {
         if (!marketplaceActive) { revert MarketplaceIsPaused(); }
-        if (price < UPDATE_PRICE) { revert PriceTooLow(); }
+        if (price < MIN_LISTING_PRICE) { revert PriceTooLow(); }
 
         totalListings++;
 
@@ -48,19 +56,17 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
             false
         );
 
-        businessCard.transferFrom(businessCard.ownerOf(cardId), address(this), cardId);
+        businessCard.transferFrom(_msgSender(), address(this), cardId);
 
         emit CardListingCreated(totalListings, cardId, _msgSender(), price);
-
-        return totalListings;
     }
     
     /// @dev See {ICardMarketplace-cancelCardListing}
-    function cancelCardListing(uint256 itemId) external override {
+    function cancelCardListing(uint256 itemId) external override activeListing(itemId) {
         uint256 cardId = _idToCardListing[itemId].cardId;
 
-        if (cardId == 0) { revert MarketItemDoesNotExist(); }
-        if (_idToCardListing[itemId].seller != _msgSender()) { revert MsgCallerIsNotTheSeller(); }
+        if (cardId == 0) { revert ListingDoesNotExist(); }
+        if (_idToCardListing[itemId].seller != _msgSender()) { revert CallerIsNotTheSeller(); }
 
         _idToCardListing[itemId].buyer = _msgSender();
         _idToCardListing[itemId].isCancelled = true;
@@ -70,32 +76,31 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
 
         emit CardListingCancelled(itemId, cardId);
     }
+
+    /// @dev See {ICardMarketplace-buyListedCard}
+    function buyListedCard(uint256 itemId) external payable override nonReentrant activeListing(itemId) {
+        uint256 cardId = _idToCardListing[itemId].cardId;
+        uint256 price = _idToCardListing[itemId].price;
+        
+        _buyListedCard(itemId, cardId, price);
+    }
     
     /// @dev See {ICardMarketplace-buyListedCard}
-    function buyListedCard(uint256 itemId, string calldata newCardName, CardProperties calldata newCardProperties) external payable override nonReentrant {
-        if (!marketplaceActive) { revert MarketplaceIsPaused(); }
-        
-        uint256 price = _idToCardListing[itemId].price;
+    function buyAndUpdateListedCard(
+        uint256 itemId, 
+        string calldata newCardName, 
+        CardProperties calldata newCardProperties
+    ) external payable override nonReentrant activeListing(itemId) {
         uint256 cardId = _idToCardListing[itemId].cardId;
+        uint256 price = _idToCardListing[itemId].price;
 
-        // Buyer must pay the seller plus the oracle fee
-        if (msg.value < price + ORACLE_FEE) { revert PriceTooLow(); }
-
-        _idToCardListing[itemId].isSold = true;
-        _idToCardListing[itemId].buyer = _msgSender();
-        filledListings++;
+        // Buyer must pay the seller plus the oracle fee plus the update price
+        if (msg.value < price + ORACLE_FEE + UPDATE_PRICE) { revert PriceTooLow(); }
 
         // Business Card update
-        businessCard.updateCardData{ value: ORACLE_FEE }(cardId, newCardName, newCardProperties);
+        businessCard.updateCardData{ value: ORACLE_FEE + UPDATE_PRICE }(cardId, newCardName, newCardProperties);
 
-        address seller = _idToCardListing[itemId].seller;
-
-        (bool success, ) = payable(seller).call{value: price}("");
-        if (!success) { revert ValueTransferFailed(); }
-
-        businessCard.transferFrom(address(this), _msgSender(), cardId);
-
-        emit CardListingFilled(itemId, cardId, seller, _msgSender(), price);
+        _buyListedCard(itemId, cardId, price);
     }
 
     /// @dev See {ICardMarketplace-getMarketListings}
@@ -164,5 +169,32 @@ contract CardMarketplace is ICardMarketplace, Ownable, ReentrancyGuard {
         (bool success, ) = payable(msg.sender).call{ value: balance }("");
 
         if (!success) { revert(); }
+    }
+
+    /// @dev Purchases a listed Business Card from the Marketplace.
+    /// @param itemId: ID of the listing that is to be bought.
+    /// @param cardId: ID of the Business Card that was listed.
+    /// @param price: Price the Business Card was listed for.
+    function _buyListedCard(uint256 itemId, uint256 cardId, uint256 price) internal {
+        if (cardId == 0) { revert ListingDoesNotExist(); }
+        if (_idToCardListing[itemId].isSold) { revert ListingWasFilled(); }
+        if (_idToCardListing[itemId].isCancelled) { revert ListingWasCancelled(); }
+        if (!marketplaceActive) { revert MarketplaceIsPaused(); }
+
+        // Buyer must pay the seller
+        if (msg.value < price) { revert PriceTooLow(); }
+
+        _idToCardListing[itemId].isSold = true;
+        _idToCardListing[itemId].buyer = _msgSender();
+        filledListings++;
+
+        address seller = _idToCardListing[itemId].seller;
+
+        (bool success, ) = payable(seller).call{ value: price }("");
+        if (!success) { revert ValueTransferFailed(); }
+
+        businessCard.transferFrom(address(this), _msgSender(), cardId);
+
+        emit CardListingFilled(itemId, cardId, seller, _msgSender(), price);
     }
 }

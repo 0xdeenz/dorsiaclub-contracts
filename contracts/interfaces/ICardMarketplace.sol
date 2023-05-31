@@ -2,14 +2,16 @@
 pragma solidity ^0.8.4;
 
 import { CardProperties, CardListing } from "../libs/Structs.sol";
-import { ORACLE_FEE, UPDATE_PRICE } from "../libs/Constants.sol";
+import { MIN_LISTING_PRICE, ORACLE_FEE, UPDATE_PRICE } from "../libs/Constants.sol";
 
 interface ICardMarketplace {
     error MarketplaceIsPaused();
     error PriceTooLow();
 
-    error MarketItemDoesNotExist();
-    error MsgCallerIsNotTheSeller();
+    error ListingDoesNotExist();
+    error ListingWasCancelled();
+    error ListingWasFilled();
+    error CallerIsNotTheSeller();
 
     error ValueTransferFailed();
 
@@ -38,8 +40,7 @@ interface ICardMarketplace {
     /// @dev Lists a Business Card on the Marketplace.
     /// @param cardId: ID of the Business Card that is being listed.
     /// @param price: Price the Business Card is being listed for.
-    /// @return itemId: ID of the listing that was created.
-    function createCardListing(uint256 cardId, uint256 price) external returns (uint256);
+    function createCardListing(uint256 cardId, uint256 price) external;
 
     /// @dev Cancels a Business Card listing.
     /// @param itemId: ID of the listing that is to be cancelled.
@@ -47,9 +48,13 @@ interface ICardMarketplace {
 
     /// @dev Purchases a listed Business Card from the Marketplace.
     /// @param itemId: ID of the listing that is to be bought.
+    function buyListedCard(uint256 itemId) external payable;
+
+    /// @dev Purchases a listed Business Card from the Marketplace and updates their parameters.
+    /// @param itemId: ID of the listing that is to be bought.
     /// @param newCardName: New name that will be assigned to the Business Card after purchase.
     /// @param newCardProperties: New properties that will be assigned to the Business Card after purchase.
-    function buyListedCard(uint256 itemId, string calldata newCardName, CardProperties calldata newCardProperties) external payable;
+    function buyAndUpdateListedCard(uint256 itemId, string calldata newCardName, CardProperties calldata newCardProperties) external payable;
 
     /// @dev Gets the Business Card listings that are currently active in the Marketplace.
     /// @return cardListings: listings that are currently active.
