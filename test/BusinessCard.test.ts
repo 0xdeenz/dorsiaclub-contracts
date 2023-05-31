@@ -1051,7 +1051,7 @@ describe("BusinessCard smart contract", () => {
             beforeEach(async () => {
                 await businessCard.getCard(firstToken.cardName, firstToken.cardProperties, { value: MINT_PRICE })
 
-                tx = businessCard.connect(signers[0]).devWorksHard()
+                tx = await businessCard.connect(signers[0]).devWorksHard()
             })
 
             it("sends the contract balance to the msg.sender", async () => {

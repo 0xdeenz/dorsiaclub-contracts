@@ -93,7 +93,7 @@ contract BusinessCard is IBusinessCard, ERC721Enumerable, Ownable {
     /// @dev See {IBusinessCard-updateCardData}
     function updateCardData(uint256 cardId, string calldata newCardName, CardProperties calldata newCardProperties) external payable override activeSale {
         if (!_isApprovedOrOwner(_msgSender(), cardId)) { revert CallerMustBeOwnerOrApproved(); }
-        if (msg.value < UPDATE_PRICE && _msgSender() != marketplaceAddress) { revert PriceTooLow(); }
+        if (msg.value < UPDATE_PRICE) { revert PriceTooLow(); }
 
         if (bytes(newCardName).length != 0 && !bytes(newCardName).validateName()) { revert NameNotValid(); }
         if (_isNameReserved(newCardName)) { revert NameIsTaken(); }
