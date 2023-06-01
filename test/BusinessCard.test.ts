@@ -29,7 +29,6 @@ describe("BusinessCard smart contract", () => {
     let oracleAddress: string;
     let owner: string;
     let minter: string;
-    let altMinter: string;
 
     // Example cardName and cardProperties
     const cardProperties = {
@@ -73,7 +72,6 @@ describe("BusinessCard smart contract", () => {
         oracleAddress = accounts[9]
         owner = accounts[0]
         minter = accounts[1]
-        altMinter = accounts[2]
 
         const { businessCardAddress, dctAddress } = await run("deploy:business-card", { 
             baseUri,
