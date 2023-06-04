@@ -12,7 +12,7 @@ import {
     MINT_PRICE,
     ORACLE_FEE,
     UPDATE_PRICE
-} from "./utils/constants";
+} from "./utils";
 import {
     BusinessCard,
     DorsiaClubToken,

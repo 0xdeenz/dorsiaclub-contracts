@@ -7,8 +7,6 @@ import {
     BusinessCard__factory,
     CardMarketplace,
     CardMarketplace__factory,
-    DorsiaClubToken,
-    DorsiaClubToken__factory,
 } from "../typechain-types";
 import { 
     MIN_LISTING_PRICE,
