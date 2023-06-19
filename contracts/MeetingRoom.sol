@@ -20,7 +20,7 @@ contract MeetingRoom is IMeetingRoom, Ownable {
     mapping(uint256 => Meeting) private _meetingRooms;
 
     /// @dev Gets a meeting room ID and an address and returns its card commitment.
-    mapping(uint256 => mapping(address => uint256)) private _cardCommitments;
+    mapping(uint256 => mapping(address => uint256)) public cardCommitments;
 
     /// @dev Initializes the Meeting Room smart contract.
     /// @param businessCardAddress: Address for the Business Card smart contract.
@@ -41,7 +41,7 @@ contract MeetingRoom is IMeetingRoom, Ownable {
 
         totalMeetingRooms++;
 
-        _cardCommitments[totalMeetingRooms][_msgSender()] = cardCommitment;
+        cardCommitments[totalMeetingRooms][_msgSender()] = cardCommitment;
 
         uint256 startTime = block.timestamp + timeToMeetingStart * 1 minutes;
         uint256 endTime = block.timestamp + timeToMeetingStart * 1 minutes + meetingDuration * 1 minutes;
@@ -60,7 +60,7 @@ contract MeetingRoom is IMeetingRoom, Ownable {
         if (msg.value != _meetingRooms[roomId].betAmount) { revert InvalidBetAmount(); }
         if (_meetingRooms[roomId].participants == MAXIMUM_MEETING_PARTICIPANTS) { revert MeetingFull(); }
 
-        _cardCommitments[roomId][_msgSender()] = cardCommitment;
+        cardCommitments[roomId][_msgSender()] = cardCommitment;
 
         _meetingRooms[roomId].participants++;
 
@@ -69,7 +69,7 @@ contract MeetingRoom is IMeetingRoom, Ownable {
 
     /// @dev See {IMeetingRoom-revealCard}
     function revealCard(uint256 roomId, uint256 cardCommitment, uint256 cardId, uint256 salt) external override {
-        if (_cardCommitments[roomId][_msgSender()] != cardCommitment) { revert CardCommitmentDoesNotMatch(); }
+        if (cardCommitments[roomId][_msgSender()] != cardCommitment) { revert CardCommitmentDoesNotMatch(); }
         if (cardCommitment != uint256(keccak256(abi.encodePacked(cardId, salt)))) { revert RevealedCardDoesNotMatch(); }
         if (businessCardContract.ownerOf(cardId) != _msgSender()) { revert CallerDoesNotOwnCard(); }
 
